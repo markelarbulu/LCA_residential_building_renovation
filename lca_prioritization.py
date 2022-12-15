@@ -21,7 +21,7 @@ t2=time.time()
 ################################################################################################
 b['el']=(b['ed_h']*b['el_h'])*3.6
 b['ec_h']=((b['ed_h']*3.6+b['el']-b['egh_h']*3.6)/b['eef_h'])-(b['ege_h']*3.6)
-b['ec_w']=(b['ed_w']*3.6/b['eef_w'])-(b['ege_w']*3.6)
+b['ec_w']=((b['ed_w']*3.6        -b['egh_w']*3.6)/b['eef_w'])-(b['ege_w']*3.6)
 b['ec_t']=b['ec_h']+b['ec_w']
 for n in b.index:                                                          ####ENVIRONMENTAL####
     b.loc[n,'gw_b6_h']=b.loc[n,'ec_h']*c.loc[b.loc[n,'process_h'],'gw_b6']  #GPW  heating
