@@ -71,6 +71,7 @@ for n in b.index:
 for n in c.index:
     c.loc[n,'rp']=(math.ceil(b.loc['base','rslb']/c.loc[n,'rslm']))-1
 for n in b.index:
+    #env
     b.loc[n,'gw_b4_a13']=((
     c.loc[b.loc[n,'mat_1'],'gw_a13']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']*c.loc[b.loc[n,'mat_1'],'rp']*((b.loc[n,'th']))+
     c.loc[b.loc[n,'mat_2'],'gw_a13']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']*c.loc[b.loc[n,'mat_2'],'rp']+
@@ -79,19 +80,40 @@ for n in b.index:
     c.loc[b.loc[n,'mat_1'],'pe_a13']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']*c.loc[b.loc[n,'mat_1'],'rp']*((b.loc[n,'th']))+
     c.loc[b.loc[n,'mat_2'],'pe_a13']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']*c.loc[b.loc[n,'mat_2'],'rp']+
     c.loc[b.loc[n,'mat_3'],'pe_a13']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med']*c.loc[b.loc[n,'mat_3'],'rp'])/(b.loc[n,'s']*b.loc[n,'rslb']))
-    b.loc[n,'fc_b4_a13']=((
-    c.loc[b.loc[n,'mat_1'],'fc_a13']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']*c.loc[b.loc[n,'mat_1'],'rp']*((b.loc[n,'th']))*((1+b.loc[n,'inf'])**c.loc[b.loc[n,'mat_1'],'rslm'])+
-    c.loc[b.loc[n,'mat_2'],'fc_a13']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']*c.loc[b.loc[n,'mat_2'],'rp']*((1+b.loc[n,'inf'])**c.loc[b.loc[n,'mat_2'],'rslm'])+
-    c.loc[b.loc[n,'mat_3'],'fc_a13']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med']*c.loc[b.loc[n,'mat_3'],'rp']*((1+b.loc[n,'inf'])**c.loc[b.loc[n,'mat_3'],'rslm']))
-    /(b.loc[n,'s']*b.loc[n,'rslb']))
+    
+
+    #ec (taking into account the inflation for each repacement year)
+    if int(c.loc[b.loc[n,'mat_1'],'rp']) != 0:
+        for y in range(1,int(1+c.loc[b.loc[n,'mat_1'],'rp'])):
+            fc_b4_a13_1=c.loc[b.loc[n,'mat_1'],'fc_a13']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']*c.loc[b.loc[n,'mat_1'],'rp']*((b.loc[n,'th']))*((1+b.loc[n,'inf'])**((c.loc[b.loc[n,'mat_1'],'rslm'])*y))
+    else: fc_b4_a13_1=0
+    if c.loc[b.loc[n,'mat_2'],'rp'] != 0:
+        for y in range(1,int(1+c.loc[b.loc[n,'mat_2'],'rp'])):
+            fc_b4_a13_2=c.loc[b.loc[n,'mat_2'],'fc_a13']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']*c.loc[b.loc[n,'mat_2'],'rp']*((1+b.loc[n,'inf'])**((c.loc[b.loc[n,'mat_2'],'rslm'])*y))    
+    else: fc_b4_a13_2=0        
+    if c.loc[b.loc[n,'mat_3'],'rp'] != 0:
+        for y in range(1,int(1+c.loc[b.loc[n,'mat_1'],'rp'])):
+            fc_b4_a13_3=c.loc[b.loc[n,'mat_3'],'fc_a13']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med']*c.loc[b.loc[n,'mat_3'],'rp']*((1+b.loc[n,'inf'])**((c.loc[b.loc[n,'mat_3'],'rslm'])*y))
+    else: fc_b4_a13_3=0        
+    b.loc[n,'fc_b4_a13']=((fc_b4_a13_1+fc_b4_a13_2+fc_b4_a13_3)/((b.loc[n,'s']*b.loc[n,'rslb'])))
 
 #STAGE B4_A5 EC
-for n in b.index:
-    b.loc[n,'fc_b4_a5']=((
-    c.loc[b.loc[n,'mat_1'],'fc_a5']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']*c.loc[b.loc[n,'mat_1'],'rp']*((1+b.loc[n,'inf'])**c.loc[b.loc[n,'mat_1'],'rslm'])+
-    c.loc[b.loc[n,'mat_2'],'fc_a5']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']*c.loc[b.loc[n,'mat_2'],'rp']*((1+b.loc[n,'inf'])**c.loc[b.loc[n,'mat_1'],'rslm'])+
-    c.loc[b.loc[n,'mat_3'],'fc_a5']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med']*c.loc[b.loc[n,'mat_3'],'rp']*((1+b.loc[n,'inf'])**c.loc[b.loc[n,'mat_1'],'rslm']))
-    /(b.loc[n,'s']*b.loc[n,'rslb']))
+
+for n in b.index:        
+    if c.loc[b.loc[n,'mat_1'],'rp'] != 0:
+            for y in range(1,int(1+c.loc[b.loc[n,'mat_1'],'rp'])):
+                fc_b4_a5_1=c.loc[b.loc[n,'mat_1'],'fc_a5']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']*((1+b.loc[n,'inf'])**((c.loc[b.loc[n,'mat_1'],'rslm'])*y))
+    else: fc_b4_a5_1=0        
+    if c.loc[b.loc[n,'mat_2'],'rp'] != 0:
+            for y in range(1,int(1+c.loc[b.loc[n,'mat_2'],'rp'])):
+                fc_b4_a5_2=c.loc[b.loc[n,'mat_2'],'fc_a5']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']*((1+b.loc[n,'inf'])**((c.loc[b.loc[n,'mat_2'],'rslm'])*y))    
+    else: fc_b4_a5_2=0         
+    if c.loc[b.loc[n,'mat_3'],'rp'] != 0:
+            for y in range(1,int(1+c.loc[b.loc[n,'mat_1'],'rp'])):
+                fc_b4_a5_3=c.loc[b.loc[n,'mat_3'],'fc_a5']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med']*((1+b.loc[n,'inf'])**((c.loc[b.loc[n,'mat_3'],'rslm'])*y))
+    else: fc_b4_a5_3=0 
+    b.loc[n,'fc_b4_a5']=((fc_b4_a5_1+fc_b4_a5_2+fc_b4_a5_3)/((b.loc[n,'s']*b.loc[n,'rslb'])))
+
 
 ################################################################################################
 #PRIORIZATION
@@ -105,29 +127,48 @@ b['emp']=((b['gw_a13']+b['gw_b4_a13'])*b['rslb'])/(
 
 #economic
 b['fc_t']=b['fc_b6']+b['fc_a13']+b['fc_a5']+b['fc_b2']+b['fc_b4_a13']+b['fc_b4_a5']
+
+
 for n in b.index:
     irr_inv=(b.loc[n,'fc_a13']+b.loc[n,'fc_a5']+b.loc[n,'fc_b4_a13']+b.loc[n,'fc_b4_a5'])*b.loc[n,'rslb']
     irr_ann=[None]*int(b.loc[n,'rslb'])
     van=[None]*200
-    van[0]=0
-    irr_ann[0]=(-1)*irr_inv
-    for x in range(1,200):
-        irr_save=((b.loc['base','ec_h']-b.loc[n,'ec_h'])*(c.loc[b.loc[n,'process_h'],'fc_b6']*(1+c.loc[b.loc[n,'process_h'],'fc_in_b6'])**x)+
-                  (b.loc['base','ec_w']-b.loc[n,'ec_w'])*(c.loc[b.loc[n,'process_w'],'fc_b6']*(1+c.loc[b.loc[n,'process_w'],'fc_in_b6'])**x))
-        irr_b2=((  c.loc[b.loc[n,'mat_1'],'fc_b2']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']+
-                   c.loc[b.loc[n,'mat_2'],'fc_b2']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']+
-                   c.loc[b.loc[n,'mat_3'],'fc_b2']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med'])/b.loc[n,'s'])*((1+b.loc[n,'inf'])**x)
-        van[x]=(van[x-1])+ irr_save - irr_b2
+    van_abs=[None]*200
+    irr_save=[None]*200
+    irr_b2=[None]*200
+    for x in range(0,200):
+        epi_h_1=c.loc[b.loc['base','process_h'],'fc_in_b6']
+        epi_h_2=c.loc[b.loc[n,'process_h'],'fc_in_b6']
+        epi_w_1=c.loc[b.loc['base','process_w'],'fc_in_b6']
+        epi_w_2=c.loc[b.loc[n,'process_w'],'fc_in_b6']
+        fc_b6h_1=c.loc[b.loc['base','process_h'],'fc_b6']
+        fc_b6w_1=c.loc[b.loc['base','process_w'],'fc_b6']
+        fc_b6h_2=c.loc[b.loc[n,'process_h'],'fc_b6']
+        fc_b6w_2=c.loc[b.loc[n,'process_w'],'fc_b6']
+        irr_save_h=(((b.loc['base','ec_h']*fc_b6h_1*(1+epi_h_1)**x))-
+                    (b.loc[n,'ec_h']*     fc_b6h_2*(1+epi_h_2)**x))
+        irr_save_w=(((b.loc['base','ec_w']*fc_b6w_1*(1+epi_w_1)**x))-
+                    (b.loc[n,'ec_w']*     fc_b6w_2*(1+epi_w_2)**x))            
+        irr_b2[x]=((c.loc[b.loc[n,'mat_1'],'fc_b2']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']+
+                    c.loc[b.loc[n,'mat_2'],'fc_b2']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']+
+                    c.loc[b.loc[n,'mat_3'],'fc_b2']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med'])
+                    /b.loc[n,'s'])*((1+b.loc[n,'inf'])**x)
+        irr_save[x]= irr_save_h + irr_save_w
+        if x==0:
+            van[x]=(-1)*irr_inv
+            irr_ann[x]=(-1)*irr_inv
+        else:
+            van[x]=(van[x-1])+ irr_save[x] - irr_b2[x]
+        van_abs[x]=int(abs(van[x]))
     for x in range(1,int(b.loc[n,'rslb'])):
-        irr_save=((b.loc['base','ec_h']-b.loc[n,'ec_h'])*(c.loc[b.loc[n,'process_h'],'fc_b6']*(1+c.loc[b.loc[n,'process_h'],'fc_in_b6'])**x)+
-                  (b.loc['base','ec_w']-b.loc[n,'ec_w'])*(c.loc[b.loc[n,'process_w'],'fc_b6']*(1+c.loc[b.loc[n,'process_w'],'fc_in_b6'])**x))
-        irr_b2=((  c.loc[b.loc[n,'mat_1'],'fc_b2']*c.loc[b.loc[n,'mat_1'],'conv']*b.loc[n,'mat_1_med']+
-                   c.loc[b.loc[n,'mat_2'],'fc_b2']*c.loc[b.loc[n,'mat_2'],'conv']*b.loc[n,'mat_2_med']+
-                   c.loc[b.loc[n,'mat_3'],'fc_b2']*c.loc[b.loc[n,'mat_3'],'conv']*b.loc[n,'mat_3_med'])/(b.loc[n,'s']*b.loc[n,'rslb']))*((1+b.loc[n,'inf'])**x)
-        irr_ann[x]=irr_save-irr_b2
+        irr_ann[x]=irr_save[x]-irr_b2[x]
     b.loc[n,'irr']=npf.irr(irr_ann)
-#    z=[ele for ele in van if ele > 0]
-#    lcp=van.index(min(z))
+    try:
+        van_array=np.array(van_abs)
+        lcp=van_array.argmin()
+        b.loc[n,'lcpb']=lcp
+    except: b.loc[n,'lcpb']= 0
+    if lcp==200: b.loc[n,'lcpb']= "NaN"
 
 b['gw_b6_red']=b.loc['base','gw_b6']-b['gw_b6']                             #GWP Operational reduction
 b['gw_int']=b['gw_a13']+b['gw_b4_a13']                                      #GWP Internal 
@@ -144,7 +185,7 @@ lca=b.filter(['ec_h','ec_w','ec_t',
 'gw_b6_h','gw_b6_w','gw_b6','gw_a13','gw_b4_a13','gw_t',
 'pe_b6_h','pe_b6_w','pe_b6','pe_a13','pe_b4_a13','pe_t',
 'fc_b6_h','fc_b6_w','fc_b6','fc_a13','fc_a5','fc_b2','fc_b4_a13','fc_b4_a5','fc_t',
-'ner','irr'])
+'ner','irr','lcpb'])
 
 #formatting
 for n in ('ec_h','ec_w','ec_t','fc_b6_h','fc_b6_w','fc_b6','fc_a13','fc_a5','fc_b2','fc_b4_a13','fc_b4_a5','fc_a5','fc_t','ner'):
